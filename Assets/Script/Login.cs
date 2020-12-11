@@ -1,6 +1,7 @@
 ﻿using PlayFab;
 using PlayFab.ClientModels;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Login : MonoBehaviour
 {
@@ -38,6 +39,7 @@ public class Login : MonoBehaviour
         PlayerPrefs.SetString("EMAIL", userEmail);
         PlayerPrefs.SetString("PASSWORD", userPassword);
         loginPanel.SetActive(false);
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     private void OnRegisterSuccess(RegisterPlayFabUserResult result){
@@ -46,6 +48,7 @@ public class Login : MonoBehaviour
         PlayerPrefs.SetString("EMAIL", userEmail);
         PlayerPrefs.SetString("PASSWORD", userPassword);
         loginPanel.SetActive(false);
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     private void OnLoginFailure(PlayFabError error)

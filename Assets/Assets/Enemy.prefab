@@ -97,7 +97,7 @@ MonoBehaviour:
   unitName: Enemy
   atk: 10
   maxHp: 100
-  currentHp: 50
+  currentHp: 100
   maxMana: 100
   currentMana: 100
 --- !u!1 &890613651329935577

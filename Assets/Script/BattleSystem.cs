@@ -9,7 +9,7 @@ public class BattleSystem : MonoBehaviour
 {
     public BattleState state;
 
-    public GameObject playerPrefab;
+    //public GameObject playerPrefab;
     public GameObject enemyPrefab;
 
     Player playerUnit;
@@ -19,6 +19,15 @@ public class BattleSystem : MonoBehaviour
     public battleHUDEnemy enemyHUD;
 
     public Text dialogueText;
+
+    public Text atk1;
+    public Text atk2;
+    public Text atk3;
+    public Text atk4;
+
+    List<Skills> skill = new List<Skills>();
+    int bonusDmg = 0;
+    int stunStattus = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -30,11 +39,17 @@ public class BattleSystem : MonoBehaviour
 
     // start the first phase of the battle
     IEnumerator SetupBattle(){
-        GameObject playerGO = Instantiate(playerPrefab);
+        GameObject playerGO = Instantiate(GameObject.Find("Player"));
         playerUnit = GameObject.Find("Player").GetComponent<Player>();
 
         GameObject enemyGO = Instantiate(enemyPrefab);
         enemyUnit = GameObject.Find("Enemy").GetComponent<Enemy>();
+
+        skill = playerUnit.GetSkill();
+        atk1.text = skill[0].skillName;
+        atk2.text = skill[1].skillName;
+        atk3.text = skill[2].skillName;
+        atk4.text = skill[3].skillName;
 
         dialogueText.text = enemyUnit.unitName + " Appear";
 
@@ -64,7 +79,8 @@ public class BattleSystem : MonoBehaviour
 
             if (isDead){
                 state = BattleState.WON;
-                EndBattle();
+                StopCoroutine(EndBattle());
+                StartCoroutine(EndBattle());
             }else{
                 state = BattleState.ENEMYTURN;
                 StopCoroutine(EnemyTurn());
@@ -82,38 +98,66 @@ public class BattleSystem : MonoBehaviour
     IEnumerator EnemyTurn(){
         // enemy attacks player, if the enemy doesn't have enough mana, he will recharge his mana and end his turn.
         // at the end of enemy's turn, recharge both player's and enemy's mana
-        dialogueText.text = "Enemy Attack";
-        yield return new WaitForSeconds(2f);
-        bool isAtk = enemyUnit.ManaLost(10);
-        if (isAtk){
-            bool isDead = playerUnit.TakeDamage(enemyUnit.atk);
-            playerHUD.SetHp(playerUnit.currentHp);
-            enemyHUD.SetMana(enemyUnit.currentMana);
-
+        if (stunStattus == 1){
+            dialogueText.text = "Enemy is stun";
+            state = BattleState.PLAYERTURN;
             yield return new WaitForSeconds(1f);
+        }
+        else
+        {
+            dialogueText.text = "Enemy Attack";
+            yield return new WaitForSeconds(2f);
+            bool isAtk = enemyUnit.ManaLost(10);
+            if (isAtk){
+                bool isDead = playerUnit.TakeDamage(enemyUnit.atk);
+                playerHUD.SetHp(playerUnit.currentHp);
+                enemyHUD.SetMana(enemyUnit.currentMana);
 
-            if (isDead){
-                state = BattleState.LOST;
-                EndBattle();
-            }else{
+                yield return new WaitForSeconds(1f);
+
+                if (isDead){
+                    state = BattleState.LOST;
+                    StopCoroutine(EndBattle());
+                    StartCoroutine(EndBattle());
+                }else{
+                    state = BattleState.PLAYERTURN;
+                }
+            } else{
+                dialogueText.text = "Enemy Recharge";
+                yield return new WaitForSeconds(1f);
+                // recharge mana
+                enemyHUD.SetMana(enemyUnit.currentMana += 25);
                 state = BattleState.PLAYERTURN;
             }
-        } else{
-            dialogueText.text = "Enemy Recharge";
-            yield return new WaitForSeconds(1f);
-            // recharge mana
-            enemyHUD.SetMana(enemyUnit.currentMana += 25);
         }
         //recharge mana
         playerHUD.SetMana(playerUnit.currentMana += 5);
+        bonusDmg = 0;
+        stunStattus = 0;
         PlayerTurn();
     }
 
-    void EndBattle(){
+    IEnumerator EndBattle(){
         if (state == BattleState.WON){
             dialogueText.text = "You Won";
         }else if (state == BattleState.LOST){
             dialogueText.text = "You Lost";
+        }
+        yield return new  WaitForSeconds(5f);
+        Application.Quit();
+    }
+
+    public void setBonusStatus(string effect){
+        if (effect.Contains("Atk+")){
+            bonusDmg = 10;
+        }else if (effect.Contains("Atk++")){
+            bonusDmg = 20;
+        }
+        else if (effect.Contains("Atk+++")){
+            bonusDmg = 30;
+        }else if (effect.Contains("Stun")){
+            bonusDmg = 0;
+            stunStattus = 1;
         }
     }
 
@@ -121,33 +165,37 @@ public class BattleSystem : MonoBehaviour
         if (state != BattleState.PLAYERTURN){
             return;
         }
-        dialogueText.text = "You Attack 1";
-        StopCoroutine(PlayerAttack(5,5));
-        StartCoroutine(PlayerAttack(5,5));
+        setBonusStatus(skill[0].bonusEffect);
+        dialogueText.text = "You Attack with " + skill[0].skillName;
+        StopCoroutine(PlayerAttack(skill[0].skillDmg + bonusDmg, skill[0].skillManaCost));
+        StartCoroutine(PlayerAttack(skill[0].skillDmg + bonusDmg, skill[0].skillManaCost));
     }
     public void OnAttack2Button(){
         if (state != BattleState.PLAYERTURN){
             return;
         }
-        dialogueText.text = "You Attack 2";
-        StopCoroutine(PlayerAttack(10,10));
-        StartCoroutine(PlayerAttack(10,10));
+        setBonusStatus(skill[1].bonusEffect);
+        dialogueText.text = "You Attack with " + skill[1].skillName;
+        StopCoroutine(PlayerAttack(skill[1].skillDmg + bonusDmg,skill[1].skillManaCost));
+        StartCoroutine(PlayerAttack(skill[1].skillDmg + bonusDmg,skill[1].skillManaCost));
     }
     public void OnAttack3Button(){
         if (state != BattleState.PLAYERTURN){
             return;
         }
-        dialogueText.text = "You Attack 3";
-        StopCoroutine(PlayerAttack(30,30));
-        StartCoroutine(PlayerAttack(30,30));
+        setBonusStatus(skill[2].bonusEffect);
+        dialogueText.text = "You Attack with " + skill[2].skillName;
+        StopCoroutine(PlayerAttack(skill[2].skillDmg + bonusDmg,skill[2].skillManaCost));
+        StartCoroutine(PlayerAttack(skill[2].skillDmg + bonusDmg,skill[2].skillManaCost));
     }
     public void OnAttack4Button(){
         if (state != BattleState.PLAYERTURN){
             return;
         }
-        dialogueText.text = "You Attack 4";
-        StopCoroutine(PlayerAttack(50,50));
-        StartCoroutine(PlayerAttack(50,50));
+        setBonusStatus(skill[3].bonusEffect);
+        dialogueText.text = "You Attack with " + skill[3].skillName;
+        StopCoroutine(PlayerAttack(skill[3].skillDmg + bonusDmg,skill[3].skillManaCost));
+        StartCoroutine(PlayerAttack(skill[3].skillDmg + bonusDmg,skill[3].skillManaCost));
     }
 
 }

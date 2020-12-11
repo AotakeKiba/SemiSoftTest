@@ -814,8 +814,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 281, y: 240.94508}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 248.7, y: 213.8}
+  m_SizeDelta: {x: 100.7, y: 84.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &230268800
 MonoBehaviour:
@@ -2250,13 +2250,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  playerPrefab: {fileID: 3483359511871623063, guid: 651bb5ef087681342bca8f1d33250730,
-    type: 3}
   enemyPrefab: {fileID: 890613651329935577, guid: f4e92054c709b7b4899e0541bfae1c86,
     type: 3}
   playerHUD: {fileID: 1962296460}
   enemyHUD: {fileID: 833323101}
   dialogueText: {fileID: 230268800}
+  atk1: {fileID: 1983883717}
+  atk2: {fileID: 927600942}
+  atk3: {fileID: 490658587}
+  atk4: {fileID: 2092749196}
 --- !u!1 &1328132063
 GameObject:
   m_ObjectHideFlags: 0

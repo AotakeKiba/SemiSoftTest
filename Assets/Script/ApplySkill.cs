@@ -27,9 +27,7 @@ public class ApplySkill : MonoBehaviour
     }
 
     public void OnClickExit(){
-        print("test");
         GameObject.Find ("MainMenu").transform.localScale = new Vector3(1, 1, 1);
-        
         GameObject.Find ("ApplyBonusSkill").transform.localScale = new Vector3(0, 0, 0);
     }
 
@@ -46,7 +44,6 @@ public class ApplySkill : MonoBehaviour
         }else{
             tempSkill[0]=playerSkill[index];
         }
-        print(tempSkill[0].skillName);
     }
 
     public void OnClickSkill1(){
